@@ -16,15 +16,29 @@
                         <moduleId />
                     </simprints>
                     <guid />
+                    <person />
                 </form>
             </instance>
 
+            <instance id="people">
+                <root>
+                    <item>
+                        <guid>00000-0000</guid>
+                        <name>Elan</name>
+                    </item>
+                    <item>
+                        <guid>11111-1111</guid>
+                        <name>Catrin</name>
+                    </item>
+                </root>
+            </instance>
 
             <bind nodeset="/form/userId" type="string" jr:preload="property" jr:preloadParams="username"/> 
             <!-- Pull Simprints API key from csv -->
             <bind nodeset="/form/simprints/apiKey" calculate="pulldata('simprints', 'value', 'sim_key', 'apiKey')"/>
             <bind nodeset="/form/simprints/moduleId" calculate="pulldata('simprints', 'value', 'sim_key', 'moduleId')"/>
             <bind nodeset="/form/guid" type="string"/>
+            <bind nodeset="/form/person" type="string" calculate="instance('people')/root/item[guid=/form/guid]/name" readonly="true()"/>
 
             <itext>
                 <translation lang="English">
@@ -36,6 +50,9 @@
                         <!-- noAppErrorString = toast displayed when Simprints can't be found -->
                         <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
                     </text>
+                    <text id="personText">
+                        <value>Person's name</value>
+                    </text>
                 </translation>
             </itext>
 
@@ -44,6 +61,9 @@
     <h:body>
         <input ref="/form/guid" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
             <label ref="jr:itext('identifyText')"/>
+        </input>
+        <input ref="/form/person">
+            <label ref="jr:itext('personText')"/>
         </input>
     </h:body>
 </h:html>
