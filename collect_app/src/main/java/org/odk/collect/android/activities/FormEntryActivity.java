@@ -60,6 +60,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.simprints.libsimprints.Constants;
+import com.simprints.libsimprints.Identification;
+import com.simprints.libsimprints.Registration;
+
 import org.javarosa.core.model.FormIndex;
 import org.javarosa.core.model.data.IAnswerData;
 import org.javarosa.core.model.instance.TreeElement;
@@ -100,6 +104,7 @@ import org.odk.collect.android.widgets.StringWidget;
 import java.io.File;
 import java.io.FileFilter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -152,6 +157,9 @@ public class FormEntryActivity extends Activity implements AnimationListener,
     public static final int OSM_CAPTURE = 19;
     public static final int GEOSHAPE_CAPTURE = 20;
     public static final int GEOTRACE_CAPTURE = 21;
+    public static final int SIMPRINTS_REGISTRATION = 22;
+    public static final int SIMPRINTS_IDENTIFY = 23;
+
 
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
@@ -736,6 +744,26 @@ public class FormEntryActivity extends Activity implements AnimationListener,
                 String bearing = intent.getStringExtra(BEARING_RESULT);
                 ((ODKView) mCurrentView).setBinaryData(bearing);
                 saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+                break;
+            case SIMPRINTS_REGISTRATION:
+            case SIMPRINTS_IDENTIFY:
+                if( resultCode != Constants.SIMPRINTS_OK){
+                    Log.w(t, String.format("Simprints returned error %d", resultCode ));
+                    break;
+                }
+                switch( requestCode ) {
+                    case SIMPRINTS_REGISTRATION:
+                        Registration registration = intent.getParcelableExtra(Constants.SIMPRINTS_REGISTRATION);
+                        ((ODKView) mCurrentView).setBinaryData(registration);
+                        saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+                        break;
+                    case SIMPRINTS_IDENTIFY:
+                        ArrayList<Identification> identifications = intent.getParcelableArrayListExtra(Constants
+                                .SIMPRINTS_IDENTIFICATIONS);
+                        ((ODKView) mCurrentView).setBinaryData(identifications);
+                        saveAnswersForCurrentScreen(DO_NOT_EVALUATE_CONSTRAINTS);
+                        break;
+                }
                 break;
             case HIERARCHY_ACTIVITY:
                 // We may have jumped to a new index in hierarchy activity, so

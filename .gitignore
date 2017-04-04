@@ -1,3 +1,6 @@
+# simprints config csv for xml forms
+simprints.csv
+
 build
 .gradle
 .idea

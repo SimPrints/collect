@@ -104,6 +104,8 @@ public class WidgetFactory {
                             questionWidget = new StringNumberWidget(context, fep, readOnlyOverride);
                         } else if (appearance.equals("url")) {
                             questionWidget = new UrlWidget(context, fep);
+                        } else if (appearance.startsWith("simprints:")) {
+                            questionWidget = new SimprintsWidget(context, fep);
                         } else {
                             questionWidget = new StringWidget(context, fep, readOnlyOverride);
                         }
