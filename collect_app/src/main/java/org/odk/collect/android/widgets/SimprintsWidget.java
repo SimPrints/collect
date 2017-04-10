@@ -244,18 +244,22 @@ public class SimprintsWidget extends QuestionWidget implements IBinaryWidget {
      */
     @Override
     public void setBinaryData(Object answer) {
-        String guid = null;
+        String answerString = null;
         switch( request ){
             case FormEntryActivity.SIMPRINTS_REGISTRATION:
-                guid = ((Registration)answer).getGuid();
+                answerString = ((Registration)answer).getGuid();
                 break;
             case FormEntryActivity.SIMPRINTS_IDENTIFY:
                 ArrayList<Identification> identifications = (ArrayList<Identification>) answer;
-                guid = identifications.size() == 0? null :identifications.get(0).getGuid();
+                if( identifications.size() != 0){
+                    answerString = String.format("%.0f %s", identifications.get(0)
+                            .getConfidence(), identifications.get(0).getGuid()) ;
+
+                }
             default:
                 break;
         }
-        mAnswer.setText(guid);
+        mAnswer.setText(answerString);
         Collect.getInstance().getFormController().setIndexWaitingForData(null);
     }
 
