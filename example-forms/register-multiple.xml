@@ -5,44 +5,64 @@
         xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         xmlns:jr="http://openrosa.org/javarosa">
     <h:head>
-        <h:title>Simprints Identification Example</h:title> 
+        <h:title>Simprints Register (Multiple)</h:title> 
         <model>
 
             <instance>
-                <form id="identificationExample">
+                <form id="registerMultiple">
                     <userId/>
                     <simprints>
                         <apiKey />
                         <moduleId />
                     </simprints>
-                    <candidate />
+                    <person jr:template="">
+                        <name />
+                        <guid />
+                    </person>
                 </form>
             </instance>
 
+            <!-- Start of Simprints call data- userId taken from Form General Settings->MetaData->Username, apiKey and moduleId from simprints.csv -->
             <bind nodeset="/form/userId" type="string" jr:preload="property" jr:preloadParams="username"/> 
-            <!-- Pull Simprints API key from csv -->
             <bind nodeset="/form/simprints/apiKey" calculate="pulldata('simprints', 'value', 'sim_key', 'apiKey')"/>
             <bind nodeset="/form/simprints/moduleId" calculate="pulldata('simprints', 'value', 'sim_key', 'moduleId')"/>
-            <bind nodeset="/form/candidate" type="string"/>
+            <!-- End of Simprints call data -->
+
+            <!-- Start of Simprints identify workflow data -->
+            <bind nodeset="/form/person/name" type="string"/>
+            <bind nodeset="/form/person/guid" type="string"/>
+            <!-- End of Simprints identify workflow data -->
 
             <itext>
                 <translation lang="English">
-                    <text id="identifyText">
+                    <text id="nameText">
+                        <value>Name</value>
+                    </text>
+                    <text id="registerText">
                         <!-- value = prompt shown above button -->
-                        <value>Identify Person</value>
+                        <value>Register Person</value>
                         <!-- buttonText = the prompt shown on the button -->
                         <value form="buttonText">Launch Simprints</value>
                         <!-- noAppErrorString = toast displayed when Simprints can't be found -->
                         <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
                     </text>
+
                 </translation>
             </itext>
 
         </model>
     </h:head>
     <h:body>
-        <input ref="/form/candidate" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
-            <label ref="jr:itext('identifyText')"/>
-        </input>
+        <group ref="/form/person">
+            <label>Person</label>
+            <repeat nodeset="/form/person">
+                <input ref="./name">
+                    <label ref="jr:itext('nameText')"/>
+                </input>
+                <input ref="./guid" appearance="simprints:REGISTER(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
+                    <label ref="jr:itext('registerText')"/>
+                </input>
+            </repeat>
+        </group>
     </h:body>
 </h:html>
