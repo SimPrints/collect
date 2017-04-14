@@ -18,7 +18,7 @@
                     <person jr:template="">
                         <guid />
                         <name>Unknown</name>
-                        <userConfirmation />
+                        <userConfirmation>yes</userConfirmation>
                         <nameManuallyEntered />
                     </person>
                 </form>
