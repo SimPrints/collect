@@ -252,8 +252,9 @@ public class SimprintsWidget extends QuestionWidget implements IBinaryWidget {
             case FormEntryActivity.SIMPRINTS_IDENTIFY:
                 ArrayList<Identification> identifications = (ArrayList<Identification>) answer;
                 if( identifications.size() != 0){
-                    answerString = String.format("%.0f %s", identifications.get(0)
-                            .getConfidence(), identifications.get(0).getGuid()) ;
+                    //answerString = String.format("%.0f %s", identifications.get(0)
+                    //        .getConfidence(), identifications.get(0).getGuid()) ;
+                    answerString = identifications.get(0).getGuid();
 
                 }
             default:

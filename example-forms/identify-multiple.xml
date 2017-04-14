@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:jr="http://openrosa.org/javarosa">
+    <h:head>
+        <h:title>Simprints Identify (Multiple)</h:title> 
+        <model>
+
+            <instance>
+                <form id="identify">
+                    <userId/>
+                    <simprints>
+                        <apiKey />
+                        <moduleId />
+                    </simprints>
+                    <person jr:template="">
+                        <guid />
+                        <name>Unknown</name>
+                        <userConfirmation />
+                        <nameManuallyEntered />
+                    </person>
+                </form>
+            </instance>
+
+            <!-- Start of Simprints call data- userId taken from Form General Settings->MetaData->Username, apiKey and moduleId from simprints.csv -->
+            <bind nodeset="/form/userId" type="string" jr:preload="property" jr:preloadParams="username"/> 
+            <bind nodeset="/form/simprints/apiKey" calculate="pulldata('simprints', 'value', 'sim_key', 'apiKey')"/>
+            <bind nodeset="/form/simprints/moduleId" calculate="pulldata('simprints', 'value', 'sim_key', 'moduleId')"/>
+            <!-- End of Simprints call data -->
+
+            <!-- Start of Simprints identify workflow data -->
+            <bind nodeset="/form/person/guid" type="string"/>
+            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/guid)" readonly="true()"/>
+            <bind nodeset="/form/person/userConfirmation" type="string" required="true()"/>
+            <bind nodeset="/form/person/nameManuallyEntered" type="string" required="true()" relevant="selected(/form/person/userConfirmation,'no')"/>
+            <!-- End of Simprints identify workflow data -->
+
+            <itext>
+                <translation lang="English">
+                    <text id="identifyText">
+                        <!-- value = prompt shown above button -->
+                        <value>Identify Person</value>
+                        <!-- buttonText = the prompt shown on the button -->
+                        <value form="buttonText">Launch Simprints</value>
+                        <!-- noAppErrorString = toast displayed when Simprints can't be found -->
+                        <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
+                    </text>
+
+                    <text id="/form/text/userConfirmation:label">
+                        <value>Is this the correct person?</value>
+                    </text>
+                    <text id="/form/text/userConfirmation:option0">
+                        <value>Yes</value>
+                    </text>
+                    <text id="/form/text/userConfirmation:option1">
+                        <value>No</value>
+                    </text>
+                                                                                                                   
+                </translation>
+            </itext>
+
+        </model>
+    </h:head>
+    <h:body>
+        <group ref="/form/person">
+            <label>Person</label>
+            <repeat nodeset="/form/person">
+                <input ref="./guid" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
+                    <label ref="jr:itext('identifyText')"/>
+                </input>
+                <input ref="./name">
+                    <label>Name</label>
+                </input>
+                <select1 ref="./userConfirmation">
+                    <label ref="jr:itext('/form/text/userConfirmation:label')"/>
+                    <item>
+                        <label ref="jr:itext('/form/text/userConfirmation:option0')"/>
+                        <value>yes</value>
+                    </item>
+                    <item>
+                        <label ref="jr:itext('/form/text/userConfirmation:option1')"/>
+                        <value>no</value>
+                    </item>
+                </select1>
+                <input ref="./nameManuallyEntered">
+                    <label>Name</label>
+                </input>
+            </repeat>
+        </group>
+    </h:body>
+</h:html>
