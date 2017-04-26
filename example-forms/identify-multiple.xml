@@ -17,8 +17,11 @@
                     </simprints>
                     <person jr:template="">
                         <simprintsId />
-                        <name>Unknown</name>
-                        <isUnknownSimprintsId />
+                        <name />
+                        <emptyReturnError/>
+                        <unknownSimprintsIdError/>
+                        <emptyReturnScreen/>
+                        <unknownSimprintsIdScreen/>
                         <userConfirmation>yes</userConfirmation>
                         <nameManuallyEntered />
                     </person>
@@ -32,11 +35,21 @@
             <!-- End of Simprints call data -->
 
             <!-- Start of Simprints identify workflow data -->
+            <!-- return from Simprints -->
             <bind nodeset="/form/person/simprintsId" type="string"/>
-            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/simprintsId)" relevant="string-length(/form/person/simprintsId) > 0" readonly="true()"/>
-            <bind nodeset="/form/person/isUnknownSimprintsId" relevant="string-length(/form/person/simprintsId) > 0 and string-length(/form/person/name) = 0" readonly="true()"/>
+
+            <!-- errors -->
+            <bind nodeset="/form/person/emptyReturnError" type="boolean" calculate="string-length(/form/person/simprintsId) = 0"/>
+            <bind nodeset="/form/person/unknownSimprintsIdError" type="boolean" calculate="not(/form/person/emptyReturnError) and string-length(/form/person/name) = 0"/>
+            <!-- error screens -->
+            <bind nodeset="/form/person/emptyReturnScreen" relevant="/form/person/emptyReturnError" required="true()"/>
+            <bind nodeset="/form/person/unknownSimprintsIdScreen" relevant="/form/person/unknownSimprintsIdError" readonly="true()"/>
+
+            <!-- results\user input -->
+            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/simprintsId)" relevant="not(/form/person/emptyReturnError)" readonly="true()"/>
             <bind nodeset="/form/person/userConfirmation" type="string" relevant="string-length(/form/person/name) > 0" required="true()"/>
             <bind nodeset="/form/person/nameManuallyEntered" type="string" required="true()" relevant="selected(/form/person/userConfirmation,'no') or string-length(/form/person/name) = 0"/>
+
             <!-- End of Simprints identify workflow data -->
 
             <itext>
@@ -50,12 +63,19 @@
                         <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
                     </text>
                     
+                    <text id="emptyReturnText">
+                        <value>WARNING: are you sure you want to continue without valid Simprints data?</value>
+                    </text>
+
                     <text id="unknownSimprintsIdText">
                         <value>WARNING: the local database appears to be out of date. Please re-download this form</value>
                     </text>
 
                     <text id="/form/text/userConfirmation:label">
                         <value>Please confirm that this is <output value="/form/person/name"/>?</value>
+                    </text>
+                    <text id="/form/text/userConfirmation:hint">
+                        <value>You can swipe back to re-scan</value>
                     </text>
                     <text id="/form/text/userConfirmation:option0">
                         <value>Yes</value>
@@ -65,7 +85,7 @@
                     </text>
 
                     <text id="nameManuallyEnteredText">
-                        <value>Please swipe back to re-scan or manually enter the name here</value>
+                        <value>Please enter the name here</value>
                     </text>
                 </translation>
             </itext>
@@ -79,11 +99,15 @@
                 <input ref="./simprintsId" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
                     <label ref="jr:itext('identifyText')"/>
                 </input>
-                <input ref="./isUnknownSimprintsId">
+                <trigger ref="./emptyReturnScreen">
+                    <label ref="jr:itext('emptyReturnText')"/>
+                </trigger>
+                <input ref="./unknownSimprintsIdScreen">
                     <label ref="jr:itext('unknownSimprintsIdText')"/>
                 </input>
                 <select1 ref="./userConfirmation">
                     <label ref="jr:itext('/form/text/userConfirmation:label')"/>
+                    <hint ref="jr:itext('/form/text/userConfirmation:hint')"/>
                     <item>
                         <label ref="jr:itext('/form/text/userConfirmation:option0')"/>
                         <value>yes</value>
