@@ -32,9 +32,9 @@
 
             <!-- Start of Simprints identify workflow data -->
             <bind nodeset="/form/person/guid" type="string"/>
-            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/guid)" readonly="true()"/>
-            <bind nodeset="/form/person/userConfirmation" type="string" required="true()"/>
-            <bind nodeset="/form/person/nameManuallyEntered" type="string" required="true()" relevant="selected(/form/person/userConfirmation,'no')"/>
+            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/guid)" relevant="string-length(/form/person/guid) > 0" readonly="true()"/>
+            <bind nodeset="/form/person/userConfirmation" type="string" relevant="string-length(/form/person/name) > 0" required="true()"/>
+            <bind nodeset="/form/person/nameManuallyEntered" type="string" required="true()" relevant="selected(/form/person/userConfirmation,'no') or string-length(/form/person/name) = 0"/>
             <!-- End of Simprints identify workflow data -->
 
             <itext>
