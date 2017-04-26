@@ -16,8 +16,9 @@
                         <moduleId />
                     </simprints>
                     <person jr:template="">
-                        <guid />
+                        <simprintsId />
                         <name>Unknown</name>
+                        <isUnknownSimprintsId />
                         <userConfirmation>yes</userConfirmation>
                         <nameManuallyEntered />
                     </person>
@@ -31,8 +32,9 @@
             <!-- End of Simprints call data -->
 
             <!-- Start of Simprints identify workflow data -->
-            <bind nodeset="/form/person/guid" type="string"/>
-            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/guid)" relevant="string-length(/form/person/guid) > 0" readonly="true()"/>
+            <bind nodeset="/form/person/simprintsId" type="string"/>
+            <bind nodeset="/form/person/name" type="string" calculate="pulldata('people', 'name', 'guid_key', /form/person/simprintsId)" relevant="string-length(/form/person/simprintsId) > 0" readonly="true()"/>
+            <bind nodeset="/form/person/isUnknownSimprintsId" relevant="string-length(/form/person/simprintsId) > 0 and string-length(/form/person/name) = 0" readonly="true()"/>
             <bind nodeset="/form/person/userConfirmation" type="string" relevant="string-length(/form/person/name) > 0" required="true()"/>
             <bind nodeset="/form/person/nameManuallyEntered" type="string" required="true()" relevant="selected(/form/person/userConfirmation,'no') or string-length(/form/person/name) = 0"/>
             <!-- End of Simprints identify workflow data -->
@@ -47,9 +49,13 @@
                         <!-- noAppErrorString = toast displayed when Simprints can't be found -->
                         <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
                     </text>
+                    
+                    <text id="unknownSimprintsIdText">
+                        <value>WARNING: the local database appears to be out of date. Please re-download this form</value>
+                    </text>
 
                     <text id="/form/text/userConfirmation:label">
-                        <value>Is this the correct person?</value>
+                        <value>Please confirm that this is <output value="/form/person/name"/>?</value>
                     </text>
                     <text id="/form/text/userConfirmation:option0">
                         <value>Yes</value>
@@ -57,7 +63,10 @@
                     <text id="/form/text/userConfirmation:option1">
                         <value>No</value>
                     </text>
-                                                                                                                   
+
+                    <text id="nameManuallyEnteredText">
+                        <value>Please swipe back to re-scan or manually enter the name here</value>
+                    </text>
                 </translation>
             </itext>
 
@@ -67,11 +76,11 @@
         <group ref="/form/person">
             <label>Person</label>
             <repeat nodeset="/form/person">
-                <input ref="./guid" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
+                <input ref="./simprintsId" appearance="simprints:IDENTIFY(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
                     <label ref="jr:itext('identifyText')"/>
                 </input>
-                <input ref="./name">
-                    <label>Name</label>
+                <input ref="./isUnknownSimprintsId">
+                    <label ref="jr:itext('unknownSimprintsIdText')"/>
                 </input>
                 <select1 ref="./userConfirmation">
                     <label ref="jr:itext('/form/text/userConfirmation:label')"/>
@@ -85,7 +94,7 @@
                     </item>
                 </select1>
                 <input ref="./nameManuallyEntered">
-                    <label>Name</label>
+                    <label ref="jr:itext('nameManuallyEnteredText')"/>
                 </input>
             </repeat>
         </group>
