@@ -16,8 +16,11 @@
                         <moduleId />
                     </simprints>
                     <person jr:template="">
-                        <name />
-                        <guid />
+                        <name/>
+                        <age/>
+                        <simprintsId/>
+                        <emptyReturnError/>
+                        <emptyReturnScreen/>
                     </person>
                 </form>
             </instance>
@@ -29,14 +32,28 @@
             <!-- End of Simprints call data -->
 
             <!-- Start of Simprints identify workflow data -->
-            <bind nodeset="/form/person/name" type="string"/>
-            <bind nodeset="/form/person/guid" type="string"/>
+            <!-- results\user input -->
+            <bind nodeset="/form/person/name" type="string" required="true()"/>
+            <bind nodeset="/form/person/age" type="int" required="true()"/>
+
+            <!-- return from Simprints -->
+            <bind nodeset="/form/person/simprintsId" type="string"/>
+
+            <!-- errors -->
+            <bind nodeset="/form/person/emptyReturnError" type="boolean" calculate="string-length(/form/person/simprintsId) = 0"/>
+
+            <!-- error screens -->
+            <bind nodeset="/form/person/emptyReturnScreen" relevant="/form/person/emptyReturnError" required="true()"/>
+
             <!-- End of Simprints identify workflow data -->
 
             <itext>
                 <translation lang="English">
                     <text id="nameText">
                         <value>Name</value>
+                    </text>
+                    <text id="ageText">
+                        <value>Age</value>
                     </text>
                     <text id="registerText">
                         <!-- value = prompt shown above button -->
@@ -45,6 +62,9 @@
                         <value form="buttonText">Launch Simprints</value>
                         <!-- noAppErrorString = toast displayed when Simprints can't be found -->
                         <value form="noAppErrorString">Simprints is not installed! Please contact your administrator.</value>
+                    </text>
+                    <text id="emptyReturnText">
+                        <value>WARNING: are you sure you want to continue without valid Simprints data?</value>
                     </text>
 
                 </translation>
@@ -59,9 +79,15 @@
                 <input ref="./name">
                     <label ref="jr:itext('nameText')"/>
                 </input>
-                <input ref="./guid" appearance="simprints:REGISTER(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
+                <input ref="./age">
+                    <label ref="jr:itext('ageText')"/>
+                </input>
+                <input ref="./simprintsId" appearance="simprints:REGISTER(apiKey=/form/simprints/apiKey, userId=/form/userId, moduleId=/form/simprints/moduleId)">
                     <label ref="jr:itext('registerText')"/>
                 </input>
+                <trigger ref="./emptyReturnScreen">
+                    <label ref="jr:itext('emptyReturnText')"/>
+                </trigger>
             </repeat>
         </group>
     </h:body>
